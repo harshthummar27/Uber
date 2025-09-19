@@ -26,14 +26,16 @@ module.exports.registerUser = async (req, res, next) => {
 
     // ✅ Then create user
     const user = await userService.createUser({
-      firstname: fullname.firstname,
-      lastname: fullname.lastname,
+      fullname: {
+        firstname: fullname.firstname,
+        lastname: fullname.lastname,
+      },
       email,
       password: hashedPassword,
     });
 
     // ✅ Then generate token
-    const token = await user.generateAuthToken();
+    const token = user.generateAuthToken();
 
     res.status(201).json({ token, user });
   } catch (error) {
