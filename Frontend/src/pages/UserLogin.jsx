@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserDataContext } from "../Context/UserContext";
+import userlogo from "../assets/uber-user-logo.png";
 
 const UserLogin = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +39,7 @@ const UserLogin = () => {
       <div>
         <img
           className="w-16 mb-10"
-          src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png"
+          src={userlogo}
           alt=""
         />
         <form

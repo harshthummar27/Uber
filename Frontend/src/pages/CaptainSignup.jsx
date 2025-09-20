@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CaptainDataContext } from "../Context/CaptainContext";
 import axios from "axios";
+import captionlog from "../assets/uber-captain-logo.png";
 
 const CaptainSignup = () => {
   const [email, setEmail] = useState("");
@@ -72,14 +73,14 @@ const CaptainSignup = () => {
       <div>
         <img
           className="w-16 mb-3"
-          src="https://pngimg.com/d/uber_PNG24.png"
+          src={captionlog}
           alt=""
         />
         <form onSubmit={submitHandler}>
           <h3 className="text-base font-medium mb-2">
             What's our Captain Name
           </h3>
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-4 mb-4">
             <input
               required
               value={firstname}
@@ -105,7 +106,7 @@ const CaptainSignup = () => {
             onChange={(e) => setEmail(e.target.value)}
             type="email"
             placeholder="example@gmail.com"
-            className="bg-[#eeeeee] mb-6 rounded px-4 py-2 border w-full"
+            className="bg-[#eeeeee] mb-4 rounded px-4 py-2 border w-full"
           />
 
           <h3 className="text-base font-medium mb-2">Password</h3>
@@ -115,11 +116,11 @@ const CaptainSignup = () => {
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             placeholder="password"
-            className="bg-[#eeeeee] mb-6 rounded px-4 py-2 border w-full"
+            className="bg-[#eeeeee] mb-4 rounded px-4 py-2 border w-full"
           />
 
           <h3 className="text-base font-medium mb-2">Vehicle Details</h3>
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-4 mb-4">
             <input
               required
               value={color}

@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { CaptainDataContext } from "../Context/CaptainContext";
+import captionlog from "../assets/uber-captain-logo.png";
+
 
 const CaptainLogin = () => {
   const [email, setEmail] = useState("");
@@ -39,7 +41,7 @@ const CaptainLogin = () => {
       <div>
         <img
           className="w-16 mb-10"
-          src="https://pngimg.com/d/uber_PNG24.png"
+          src={captionlog}
           alt=""
         />
         <form
