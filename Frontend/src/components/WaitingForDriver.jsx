@@ -1,22 +1,28 @@
 import React from "react";
 import ubergo from "../assets/ubergo.jpg";
 
-const ConfirmRide = (props) => {
+const WaitingForDriver = () => {
   return (
     <div>
       <h5
         onClick={() => {
-          props.setConfirmRidePanel(false);
+          props.setWaitingForDriver(false);
         }}
         className="text-center p-1 w-[93%] absolute top-0"
       >
         <i className="text-3xl text-gray-200 ri-arrow-down-wide-line"></i>
       </h5>
-      <h3 className="text-2xl font-semibold mb-5">Confirm your Ride</h3>
+
+      <div className="flex items-center justify-between">
+        <img className="h-12" src={ubergo} alt="" />
+        <div className="text-right">
+          <h2 className="text-lg font-medium">munnodon</h2>
+          <h4 className="text-xl font-semibold -mt-1 -mb-1">GJ18 AB 2500</h4>
+          <p className="text-sm text-gray-600">Reng Rover Sport</p>
+        </div>
+      </div>
 
       <div className="flex justify-between gap-2 flex-col items-center">
-        <img className="h-20" src={ubergo} alt="" />
-      </div>
       <div className="w-full mt-5">
         <div className="flex items-center gap-5 p-3 border-gray-200 border-b-2">
           <i className="text-lg ri-map-pin-2-fill"></i>
@@ -40,14 +46,9 @@ const ConfirmRide = (props) => {
           </div>
         </div>
       </div>
-      <button onClick={() => {
-        props.setVehicleFound(true)
-        props.setConfirmRidePanel(false)
-      }} className="mt-5 w-full bg-green-600 text-white font-semibold p-2 rounded-lg">
-        Confirm
-      </button>
+    </div>
     </div>
   );
 };
 
-export default ConfirmRide;
+export default WaitingForDriver;
