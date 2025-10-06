@@ -1,15 +1,35 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { body } = require('express-validator');
-const rideController = require('../controllers/ride.controller');
-const authMiddleware = require('../middleware/auth.middleware')
+const { body, param } = require("express-validator");
+const rideController = require("../controllers/ride.controller");
+const authMiddleware = require("../middleware/auth.middleware");
 
-router.post('/create',
-    authMiddleware.authUser,
-    body('pickup').isString().isLength({min : 3}).withMessage('Invalid Pikeup location'),
-    body('destination').isString().isLength({min : 3    }).withMessage('Invalid destination add'),
-    body('vehicleType').isString().isIn(['car', 'auto', 'bike']).withMessage('Invalid Vehicle type'),
-    rideController.createRide
-)
+router.post(
+  "/",
+  authMiddleware.authUser,
+  [
+    body("pickup.address").isString().isLength({ min: 1 }),
+    body("pickup.lat").isFloat(),
+    body("pickup.lng").isFloat(),
+    body("destination.address").isString().isLength({ min: 1 }),
+    body("destination.lat").isFloat(),
+    body("destination.lng").isFloat(),
+  ],
+  rideController.createRide
+);
+
+router.get(
+  "/:rideId/distance",
+  authMiddleware.authUser,
+  [param("rideId").isMongoId()],
+  rideController.getRideDistance
+);
+
+router.get(
+  "/:rideId/fare",
+  authMiddleware.authUser,
+  [param("rideId").isMongoId()],
+  rideController.getFare
+);
 
 module.exports = router;
