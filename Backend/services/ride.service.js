@@ -1,76 +1,74 @@
 const rideModel = require('../models/ride.model');
 const mapService = require('./maps.service');
-const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
-
-function getOtp(num){
-    function generateOtp (num) {
-        const otp =    crypto.randomInt(Math.pow(10, num - 1 ), Math.pow(10, num)).toString();
-        return otp;
-    }
-    return generateOtp(num);
+// -------------------- OTP Generator --------------------
+function getOtp(num) {
+    return crypto.randomInt(Math.pow(10, num - 1), Math.pow(10, num)).toString();
 }
 
-async function getFare(pickup, destination) {
+// -------------------- Fare Calculation --------------------
+const VEHICLE_RATES = {
+    auto: { baseFare: 20, perKm: 8, perMinute: 1.5, minimumFare: 50 },
+    car: { baseFare: 35, perKm: 11, perMinute: 2, minimumFare: 80 },
+    moto: { baseFare: 15, perKm: 5.5, perMinute: 1, minimumFare: 40 }
+};
 
-    if (!pickup || !destination) {
-        throw new Error('Pickup and destination are required');
+// Calculate fare for a single vehicle type
+async function calculateFare(distanceMeters, durationSeconds, vehicleType) {
+    const rates = VEHICLE_RATES[vehicleType];
+    if (!rates) throw new Error("Invalid vehicle type");
+
+    const distanceKm = distanceMeters / 1000;
+    const durationMin = durationSeconds / 60;
+
+    let fare =
+        rates.baseFare +
+        distanceKm * rates.perKm +
+        durationMin * rates.perMinute;
+
+    if (fare < rates.minimumFare) {
+        fare = rates.minimumFare;
     }
 
-    const distanceTime = await mapService.getDistanceTime(pickup, destination);
-
-    const baseFare = {
-        auto: 30,
-        car: 50,
-        moto: 20
-    };
-
-    const perKmRate = {
-        auto: 10,
-        car: 15,
-        moto: 8
-    };
-
-    const perMinuteRate = {
-        auto: 2,
-        car: 3,
-        moto: 1.5
-    };
-
-
-
-    const fare = {
-        auto: Math.round(baseFare.auto + ((distanceTime.distance.value / 1000) * perKmRate.auto) + ((distanceTime.duration.value / 60) * perMinuteRate.auto)),
-        car: Math.round(baseFare.car + ((distanceTime.distance.value / 1000) * perKmRate.car) + ((distanceTime.duration.value / 60) * perMinuteRate.car)),
-        moto: Math.round(baseFare.moto + ((distanceTime.distance.value / 1000) * perKmRate.moto) + ((distanceTime.duration.value / 60) * perMinuteRate.moto))
-    };
-
-    return fare;
-
-
+    return Math.round(fare);
 }
 
-module.exports.getFare = getFare;
+// -------------------- Calculate All Vehicle Fares --------------------
+async function calculateAllFares(distanceMeters, durationSeconds) {
+    const allFares = {};
+    for (const vehicleType of Object.keys(VEHICLE_RATES)) {
+        allFares[vehicleType] = await calculateFare(distanceMeters, durationSeconds, vehicleType);
+    }
+    return allFares;
+}
 
-module.exports.createRide = async ({
-    user, pickup, destination, vehicleType
-}) => {
-    if (!user || !pickup || !destination || !vehicleType) {
+// -------------------- Ride Creation --------------------
+async function createRide({ user, pickup, destination }) {
+    if (!user || !pickup || !destination) {
         throw new Error('All fields are required');
     }
 
-    const fare = await getFare(pickup, destination);
+    // Get distance & duration from map service
+    const dt = await mapService.getDistanceTimeFromCoords(pickup, destination);
 
-
-
-    const ride = rideModel.create({
+    // Create ride in DB
+    const ride = await rideModel.create({
         user,
         pickup,
         destination,
-        otp : getOtp(6),
-        fare: fare[ vehicleType ]
-    })
+        distance: dt.distance.value,  // meters
+        duration: dt.duration.value,  // seconds
+        fare: 0,                      // will calculate later
+        otp: getOtp(6)
+    });
 
     return ride;
 }
+
+module.exports = {
+    createRide,
+    calculateFare,
+    calculateAllFares, // <-- add this
+    VEHICLE_RATES
+};
